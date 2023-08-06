@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Date;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -19,4 +21,6 @@ public class CustomerResponse {
     private String diskon;
     private String tipeDiskon;
     private String ktp;
+    private Date createdAt;
+    private Date updatedAt;
 }

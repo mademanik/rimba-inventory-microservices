@@ -87,7 +87,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public void deleteItemById(Long id) {
-        //get url file directory
+        //get url file
         Optional<Item> item = itemRepository.findById(id);
         String filePath = fileUploadRoot + "/" + item.get().getBarang();
 

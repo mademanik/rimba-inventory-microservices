@@ -3,7 +3,6 @@ package com.rimba.item.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rimba.item.dto.request.ItemRequest;
 import com.rimba.item.dto.response.ItemResponse;
-import com.rimba.item.repository.ItemRepository;
 import com.rimba.item.service.ItemService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,8 +19,6 @@ import java.util.Optional;
 @RequestMapping("/api/item")
 @Slf4j
 public class ItemController {
-    @Autowired
-    private ItemRepository itemRepository;
 
     @Autowired
     private ItemService itemService;

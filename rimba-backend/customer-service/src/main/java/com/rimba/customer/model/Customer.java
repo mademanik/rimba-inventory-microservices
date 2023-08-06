@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Date;
 
 @Entity
 @Table(name = "customers")
@@ -28,6 +29,8 @@ public class Customer implements Serializable {
     private String diskon;
     private String tipeDiskon;
     private String ktp;
+    private Date createdAt;
+    private Date updatedAt;
 }
 
 
