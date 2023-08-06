@@ -1,0 +1,22 @@
+version: '3.7'
+services:
+  ##Postgres
+  postgres-rimba:
+    container_name: postgres-rimba
+    image: postgres:latest
+    volumes:
+      - ./docker-compose-config/postgres-rimba:/data/postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: item_rimba
+      POSTGRES_USER: rimba
+      POSTGRES_PASSWORD: rimba123
+      PGDATA: /data/postgres
+    restart: always
+    networks:
+      - rimba
+
+networks:
+  rimba:
+    driver: bridge

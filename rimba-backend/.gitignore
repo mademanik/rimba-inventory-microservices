@@ -1,0 +1,9 @@
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+
+# Compiled Java classes
+*.class
+
+docker-compose-config/*
