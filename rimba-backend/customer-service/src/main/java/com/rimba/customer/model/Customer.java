@@ -26,7 +26,7 @@ public class Customer implements Serializable {
     private String contact;
     private String email;
     private String alamat;
-    private String diskon;
+    private Double diskon;
     private String tipeDiskon;
     private String ktp;
     private Date createdAt;

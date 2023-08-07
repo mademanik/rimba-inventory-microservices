@@ -2,6 +2,7 @@ package com.rimba.item.service;
 
 import com.rimba.item.dto.request.ItemRequest;
 import com.rimba.item.dto.response.ItemResponse;
+import com.rimba.item.dto.response.ItemStockResponse;
 import com.rimba.item.model.Item;
 import com.rimba.item.repository.ItemRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -100,6 +101,15 @@ public class ItemServiceImpl implements ItemService {
             log.warn("Failed Delete Item with id: {}", id);
         }
 
+    }
+
+    @Override
+    public ItemStockResponse getItemStock(Long id) {
+        Optional<Item> item = itemRepository.findById(id);
+        ItemStockResponse itemStockResponse = ItemStockResponse.builder()
+                .stock(item.get().getStock())
+                .build();
+        return itemStockResponse;
     }
 
     private ItemResponse mapToItemResponse(Item item) {

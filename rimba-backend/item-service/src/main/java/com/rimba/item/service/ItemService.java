@@ -2,6 +2,7 @@ package com.rimba.item.service;
 
 import com.rimba.item.dto.request.ItemRequest;
 import com.rimba.item.dto.response.ItemResponse;
+import com.rimba.item.dto.response.ItemStockResponse;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -15,4 +16,6 @@ public interface ItemService {
     public Optional<ItemResponse> getItemById(Long id);
 
     public void deleteItemById(Long id);
+
+    public ItemStockResponse getItemStock(Long id);
 }

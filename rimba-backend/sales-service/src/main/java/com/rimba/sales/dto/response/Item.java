@@ -1,26 +1,25 @@
-package com.rimba.customer.dto.response;
+package com.rimba.sales.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class CustomerResponse {
+public class Item {
 
     private Long id;
-    private String name;
-    private String contact;
-    private String email;
-    private String alamat;
-    private Double diskon;
-    private String tipeDiskon;
-    private String ktp;
+    private String namaItem;
+    private String unit;
+    private Double stock;
+    private BigDecimal hargaSatuan;
+    private String barang;
     private Date createdAt;
     private Date updatedAt;
 }
