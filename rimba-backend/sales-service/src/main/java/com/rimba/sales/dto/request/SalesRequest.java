@@ -17,5 +17,4 @@ public class SalesRequest {
     private String tglTransaksi;
     private Long customerId;
     private List<ItemSales> itemSales;
-    private BigDecimal totalBayar;
 }

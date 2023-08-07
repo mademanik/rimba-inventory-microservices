@@ -112,6 +112,24 @@ public class ItemServiceImpl implements ItemService {
         return itemStockResponse;
     }
 
+    @Override
+    public Boolean updateItemStock(Long id, Double reqStock) {
+        Optional<Item> itemData = itemRepository.findById(id);
+        if (itemData.isPresent()) {
+            Item item = itemData.get();
+            Double currentStock = item.getStock();
+            item.setStock(item.getStock() - reqStock);
+
+            log.info("Updated item with id: " + id + ", currentStock: " + currentStock + ", reqStock: " + reqStock);
+            log.info("Item Stock with id: {} is successfully updated", id);
+            itemRepository.save(item);
+
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     private ItemResponse mapToItemResponse(Item item) {
         return ItemResponse.builder()
                 .id(item.getId())

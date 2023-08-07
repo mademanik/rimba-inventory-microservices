@@ -9,7 +9,3 @@
 docker-compose-config/*
 
 uploads/*
-Double qty = 10.0
-BigDecimal price = 10000
-
-BigDecimal totalHarga = qty/1 * 10000

@@ -18,4 +18,6 @@ public interface ItemService {
     public void deleteItemById(Long id);
 
     public ItemStockResponse getItemStock(Long id);
+
+    public Boolean updateItemStock(Long id, Double reqStock);
 }

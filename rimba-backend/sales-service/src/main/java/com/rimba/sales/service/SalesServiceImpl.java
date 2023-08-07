@@ -1,10 +1,7 @@
 package com.rimba.sales.service;
 
 import com.rimba.sales.dto.request.SalesRequest;
-import com.rimba.sales.dto.response.Item;
-import com.rimba.sales.dto.response.ItemStockResponse;
-import com.rimba.sales.dto.response.SalesResponse;
-import com.rimba.sales.dto.response.Customer;
+import com.rimba.sales.dto.response.*;
 import com.rimba.sales.model.ItemSales;
 import com.rimba.sales.model.Sales;
 import com.rimba.sales.repository.SalesRepository;
@@ -16,7 +13,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import java.math.BigDecimal;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -46,6 +42,7 @@ public class SalesServiceImpl implements SalesService {
         List<Item> items = new ArrayList<>();
         BigDecimal totalDiskon = BigDecimal.ZERO;
         BigDecimal totalHarga = BigDecimal.ZERO;
+        BigDecimal totalBayar = BigDecimal.ZERO;
 
         Customer customer = getCustomer(salesRequest.getCustomerId());
 
@@ -63,13 +60,23 @@ public class SalesServiceImpl implements SalesService {
                 item.setStock(itemSales.getQty());
                 items.add(item);
 
-                BigDecimal diskonInit = item.getHargaSatuan().multiply(BigDecimal.valueOf(customer.getDiskon() / 100));
+                if (customer.getTipeDiskon().equalsIgnoreCase("persentase")) {
+                    BigDecimal diskonInit = item.getHargaSatuan().multiply(BigDecimal.valueOf(customer.getDiskon() / 100));
+                    totalDiskon = totalDiskon.add(diskonInit.multiply(BigDecimal.valueOf(itemSales.getQty())));
+                    BigDecimal hargaSebelumDiskon = item.getHargaSatuan().multiply(BigDecimal.valueOf(itemSales.getQty()));
+                    totalHarga = totalHarga.add(item.getHargaSatuan().multiply(BigDecimal.valueOf(itemSales.getQty())));
+                    totalBayar = totalBayar.add(hargaSebelumDiskon.subtract(diskonInit.multiply(BigDecimal.valueOf(itemSales.getQty()))));
 
-                totalDiskon = totalDiskon.add(diskonInit.multiply(BigDecimal.valueOf(itemSales.getQty())));
+                } else {
+                    BigDecimal diskonInit = item.getHargaSatuan().subtract(BigDecimal.valueOf(customer.getDiskon()));
+                    totalDiskon = totalDiskon.add(diskonInit.multiply(BigDecimal.valueOf(itemSales.getQty())));
+                    BigDecimal hargaSebelumDiskon = item.getHargaSatuan().multiply(BigDecimal.valueOf(itemSales.getQty()));
+                    totalHarga = totalHarga.add(item.getHargaSatuan().multiply(BigDecimal.valueOf(itemSales.getQty())));
+                    totalBayar = totalBayar.add(hargaSebelumDiskon.subtract(diskonInit.multiply(BigDecimal.valueOf(itemSales.getQty()))));
+                }
 
-                BigDecimal hargaSebelumDiskon = item.getHargaSatuan().multiply(BigDecimal.valueOf(itemSales.getQty()));
-
-                totalHarga = totalHarga.add(hargaSebelumDiskon.subtract(diskonInit.multiply(BigDecimal.valueOf(itemSales.getQty()))));
+                //updated stock
+                updateItemStock(itemSales.getItemId(), itemSales.getQty());
             }
         }
 
@@ -83,11 +90,13 @@ public class SalesServiceImpl implements SalesService {
                     .item(salesRequest.getItemSales())
                     .totalDiskon(totalDiskon)
                     .totalHarga(totalHarga)
-                    .totalBayar(salesRequest.getTotalBayar())
+                    .totalBayar(totalBayar)
                     .createdAt(new Date())
                     .updatedAt(new Date())
                     .build();
             salesRepository.save(sales);
+
+
             log.info("Sales with id : {} is successfully created", sales.getId());
             return mapToSalesResponse(sales, customer, items);
         }
@@ -214,5 +223,19 @@ public class SalesServiceImpl implements SalesService {
                 .block();
 
         return item;
+    }
+
+    @Override
+    public ItemStockUpdate updateItemStock(Long id, Double stock) {
+        String url = itemUrl + "/updateStock/" + id + "/" + stock;
+
+        ItemStockUpdate itemStockUpdate = webClientBuilder.build()
+                .get()
+                .uri(url)
+                .retrieve()
+                .bodyToMono(ItemStockUpdate.class)
+                .block();
+
+        return itemStockUpdate;
     }
 }

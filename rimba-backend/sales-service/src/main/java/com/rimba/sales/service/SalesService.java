@@ -1,10 +1,7 @@
 package com.rimba.sales.service;
 
 import com.rimba.sales.dto.request.SalesRequest;
-import com.rimba.sales.dto.response.Item;
-import com.rimba.sales.dto.response.ItemStockResponse;
-import com.rimba.sales.dto.response.SalesResponse;
-import com.rimba.sales.dto.response.Customer;
+import com.rimba.sales.dto.response.*;
 
 import java.util.List;
 import java.util.Optional;
@@ -24,5 +21,7 @@ public interface SalesService {
     public Customer getCustomer(Long id);
 
     public Item getItem(Long id);
+
+    public ItemStockUpdate updateItemStock(Long id, Double stock);
 
 }

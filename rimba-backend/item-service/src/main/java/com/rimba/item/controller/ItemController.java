@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rimba.item.dto.request.ItemRequest;
 import com.rimba.item.dto.response.ItemResponse;
 import com.rimba.item.dto.response.ItemStockResponse;
+import com.rimba.item.dto.response.ItemStockUpdate;
 import com.rimba.item.service.ItemService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,6 +81,22 @@ public class ItemController {
         } catch (Exception e) {
             log.info("Error getItemStock {}", e.getMessage());
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/updateStock/{id}/{stock}")
+    public ResponseEntity<ItemStockUpdate> updateItemStock(@PathVariable("id") Long id, @PathVariable("stock") Double stock) {
+        ItemStockUpdate itemStockUpdate = new ItemStockUpdate();
+        itemStockUpdate.setIsStockUpdated(false);
+        try {
+            Boolean isUpdated = itemService.updateItemStock(id, stock);
+            if (isUpdated) {
+                itemStockUpdate.setIsStockUpdated(isUpdated);
+            }
+            return new ResponseEntity<>(itemStockUpdate, HttpStatus.OK);
+        } catch (Exception e) {
+            log.info("Error updateItemStock {}", e.getMessage());
+            return new ResponseEntity<>(itemStockUpdate, HttpStatus.OK);
         }
     }
 }
