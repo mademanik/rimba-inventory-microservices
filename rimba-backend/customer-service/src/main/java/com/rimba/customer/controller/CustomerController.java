@@ -88,7 +88,7 @@ public class CustomerController {
         }
     }
 
-    @GetMapping("/download/{id}/{filename:.+}")
+    @GetMapping("/ktp/{id}/{filename:.+}")
     @ResponseBody
     public ResponseEntity<Resource> getDownload(@PathVariable Long id, @PathVariable String filename) {
         log.info("Download Request: " + filename + " with id " + id);

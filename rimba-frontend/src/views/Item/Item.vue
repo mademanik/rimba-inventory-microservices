@@ -124,7 +124,7 @@ export default {
             this.getItems();
             setTimeout(() => {
               this.deleteMessage = "";
-            }, 3000); // Clear the success message after 3 seconds
+            }, 3000);
           });
         } catch (err) {
           console.log("delete item failed");

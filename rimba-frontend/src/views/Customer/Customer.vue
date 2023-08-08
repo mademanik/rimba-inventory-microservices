@@ -10,6 +10,13 @@
         </h5>
       </div>
       <div class="card-body">
+        <div v-if="message" :class="alertCustomer" role="alert">
+          {{ messageCustomer }}
+        </div>
+        <div v-if="deleteMessage" class="alert alert-success">
+          {{ deleteMessage }}
+        </div>
+
         <table class="table table-bordered">
           <thead>
             <tr>
@@ -33,12 +40,23 @@
               <td>{{ customer.alamat }}</td>
               <td>{{ customer.diskon }}</td>
               <td>{{ customer.tipeDiskon }}</td>
-              <td>{{ customer.ktp }}</td>
               <td>
-                <RouterLink to="/editCustomer" class="btn btn-success ml-2 mr-2"
+                <img
+                  :src="getImageUrl(customer.id, customer.ktp)"
+                  alt=""
+                  class="img-thumbnail"
+                  style="width: 80px;"
+                />
+              </td>
+              <td>
+                <RouterLink to="/editCustomer" class="btn btn-success"
                   >Edit</RouterLink
                 >
-                <button type="button" class="btn btn-danger mx-2">
+                <button
+                    type="button"
+                    class="btn btn-danger mx-2"
+                    @click="deleteItems(customer.id)"
+                  >
                   Delete
                 </button>
               </td>
@@ -59,7 +77,7 @@
 import axios from "axios";
 
 export default {
-  name: "students",
+  name: "customers",
   data() {
     return {
       customers: [],
@@ -70,6 +88,20 @@ export default {
   mounted() {
     this.getCustomers();
   },
+  computed: {
+    messageCustomer() {
+      return this.$route.query.message;
+    },
+    alertCustomer() {
+      const isSuccess = this.$route.query.responseCode === "201";
+
+      return {
+        alert: true,
+        "alert-success": isSuccess,
+        "alert-danger": !isSuccess,
+      };
+    },
+  },
   methods: {
     getCustomers() {
       try {
@@ -78,6 +110,22 @@ export default {
         });
       } catch (err) {
         console.log("getCustomers failed");
+      }
+    },
+    deleteItems(id) {
+      if (window.confirm("Are you sure ? ")) {
+        try {
+          axios.delete(`http://localhost/api/customers/${id}`).then((res) => {
+            console.log(res);
+            this.deleteMessage = "Customer deleted successfully!";
+            this.getCustomers();
+            setTimeout(() => {
+              this.deleteMessage = "";
+            }, 3000);
+          });
+        } catch (err) {
+          console.log("delete item failed");
+        }
       }
     },
     getImageUrl(id, barang) {
