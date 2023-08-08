@@ -8,11 +8,18 @@
             to="/items/addItem"
             class="btn btn-primary float-end mx-2"
           >
-          <i class="fas fa-plus"></i> Items
+            <i class="fas fa-plus"></i> Items
           </RouterLink>
-          <RouterLink to="/items" class="btn btn-warning float-end">
+          <!-- <RouterLink to="/items" class="btn btn-warning float-end">
             Refresh
-          </RouterLink>
+          </RouterLink> -->
+          <button
+            type="button"
+            class="btn btn-warning float-end"
+            @click="refreshItems()"
+          >
+            Refresh
+          </button>
         </h4>
       </div>
       <div class="card-body">
@@ -22,7 +29,7 @@
         <div v-if="deleteMessage" class="alert alert-success">
           {{ deleteMessage }}
         </div>
-        <table class="table table-bordered" style="width: 100%;">
+        <table class="table table-bordered" style="width: 100%">
           <thead>
             <tr>
               <th>ID</th>
@@ -46,7 +53,7 @@
                   :src="getImageUrl(item.id, item.barang)"
                   alt=""
                   class="img-thumbnail"
-                  style="width: 80px;"
+                  style="width: 80px"
                 />
               </td>
               <td>
@@ -133,6 +140,12 @@ export default {
     },
     getImageUrl(id, barang) {
       return `http://localhost/api/item/barang/${id}/${barang}`;
+    },
+    refreshItems() {
+      this.getItems();
+      this.$router.push({
+        name: "items",
+      });
     },
   },
 };

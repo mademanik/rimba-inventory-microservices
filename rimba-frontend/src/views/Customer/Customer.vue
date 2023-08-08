@@ -10,9 +10,16 @@
           >
             <i class="fas fa-plus"></i> Customer
           </RouterLink>
-          <RouterLink to="/customers" class="btn btn-warning float-end">
+          <!-- <RouterLink to="/customers" class="btn btn-warning float-end">
             Refresh
-          </RouterLink>
+          </RouterLink> -->
+          <button
+            type="button"
+            class="btn btn-warning float-end"
+            @click="refreshCustomers()"
+          >
+            Refresh
+          </button>
         </h5>
       </div>
       <div class="card-body">
@@ -130,12 +137,18 @@ export default {
             }, 3000);
           });
         } catch (err) {
-          console.log("delete item failed");
+          console.log("delete customer failed");
         }
       }
     },
     getImageUrl(id, barang) {
       return `http://localhost/api/customer/ktp/${id}/${barang}`;
+    },
+    refreshCustomers() {
+      this.getCustomers();
+      this.$router.push({
+        name: "customers",
+      });
     },
   },
 };

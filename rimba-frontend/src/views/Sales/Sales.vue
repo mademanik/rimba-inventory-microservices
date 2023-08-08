@@ -10,16 +10,25 @@
           >
             <i class="fas fa-plus"></i> Sales
           </RouterLink>
-          <RouterLink to="/sales" class="btn btn-warning float-end">
+          <!-- <RouterLink to="/sales" class="btn btn-warning float-end">
             Refresh
-          </RouterLink>
+          </RouterLink> -->
+          <button
+            type="button"
+            class="btn btn-warning float-end"
+            @click="refreshSales()"
+          >
+            Refresh
+          </button>
         </h4>
       </div>
       <div class="card-body">
         <div v-if="message" :class="alertClasses" role="alert">
           {{ message }}
         </div>
-
+        <div v-if="deleteMessage" class="alert alert-success">
+          {{ deleteMessage }}
+        </div>
         <table class="table table-bordered">
           <thead>
             <tr>
@@ -105,8 +114,25 @@ export default {
     },
     deleteSales(id) {
       if (window.confirm("Are you sure ? ")) {
-        console.log(id);
+        try {
+          axios.delete(`http://localhost/api/sales/${id}`).then((res) => {
+            console.log(res);
+            this.deleteMessage = "Sales deleted successfully!";
+            this.getSales();
+            setTimeout(() => {
+              this.deleteMessage = "";
+            }, 3000);
+          });
+        } catch (err) {
+          console.log("delete sales failed");
+        }
       }
+    },
+    refreshSales() {
+      this.getSales();
+      this.$router.push({
+        name: "sales",
+      });
     },
   },
 };
