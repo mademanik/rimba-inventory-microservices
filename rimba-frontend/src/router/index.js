@@ -4,6 +4,8 @@ import CustomerView from "../views/Customer/Customer.vue";
 import ItemView from "../views/Item/Item.vue";
 import SalesView from "../views/Sales/Sales.vue";
 import AddItemView from "../views/Item/AddItem/AddItem.vue";
+import AddCustomerView from "../views/Customer/AddCustomer/AddCustomer.vue";
+
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -17,6 +19,11 @@ const router = createRouter({
       path: "/customers",
       name: "customers",
       component: CustomerView,
+    },
+    {
+      path: "/customers/addCustomer",
+      name: "addCustomer",
+      component: AddCustomerView,
     },
     {
       path: "/items",

@@ -4,67 +4,86 @@
       <div class="col col-lg-6">
         <div class="card">
           <div class="card-header">
-            <h4>Add Item</h4>
+            <h4>Add Customer</h4>
           </div>
           <div class="card-body">
-            <form @submit.prevent="submitForm">
+            <form @submit.prevent="submitFormCustomer">
               <div class="mb-3">
                 <label class="form-label"
-                  ><span class="text-danger"><strong>*</strong></span> Nama
-                  Item</label
+                  ><span class="text-danger"><strong>*</strong></span>
+                  Nama</label
                 >
                 <input
                   type="text"
                   class="form-control"
-                  id="namaItem"
-                  name="namaItem"
-                  v-model="formData.namaItem"
+                  id="name"
+                  name="name"
+                  v-model="formData.name"
                   required
                 />
               </div>
               <div class="mb-3">
                 <label class="form-label"
-                  ><span class="text-danger"><strong>*</strong></span
-                  >Unit</label
+                  ><span class="text-danger"><strong>*</strong></span>
+                  Contact</label
                 >
-                <select class="form-select" v-model="formData.unit" required>
-                  <option value="" selected>--Pilih Unit--</option>
-                  <option value="kg">Kg</option>
-                  <option value="pcs">Pcs</option>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="contact"
+                  name="contact"
+                  v-model="formData.contact"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label class="form-label"
+                  ><span class="text-danger"><strong>*</strong></span>
+                  Email</label
+                >
+                <input
+                  type="email"
+                  class="form-control"
+                  id="email"
+                  name="email"
+                  v-model="formData.email"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Tipe Diskon</label>
+                <select class="form-select" v-model="formData.tipeDiskon">
+                  <option value="" selected>--Pilih Tipe Diskon--</option>
+                  <option value="persentase">Persentase</option>
+                  <option value="fix">Fix</option>
                 </select>
               </div>
               <div class="mb-3">
-                <label class="form-label"
-                  ><span class="text-danger"><strong>*</strong></span
-                  >Stock</label
-                >
+                <label class="form-label"> Diskon</label>
                 <input
                   type="text"
                   class="form-control"
-                  id="stock"
-                  name="stock"
-                  v-model="formData.stock"
-                  required
+                  id="diskon"
+                  name="diskon"
+                  v-model="formData.diskon"
                 />
               </div>
               <div class="mb-3">
                 <label class="form-label"
-                  ><span class="text-danger"><strong>*</strong></span
-                  >Harga Satuan</label
+                  ><span class="text-danger"><strong>*</strong></span>
+                  Alamat</label
                 >
-                <input
-                  type="text"
+                <textarea
                   class="form-control"
-                  id="hargaSatuan"
-                  name="hargaSatuan"
-                  v-model="formData.hargaSatuan"
-                  required
-                />
+                  id="alamat"
+                  v-model="formData.alamat"
+                  rows="3"
+                ></textarea>
               </div>
               <div class="mb-3">
                 <label for="formFile" class="form-label"
                   ><span class="text-danger"><strong>*</strong></span
-                  >Barang (Image)</label
+                  >Ktp (Image)</label
                 >
                 <input
                   class="form-control"
@@ -87,7 +106,7 @@
               <button type="submit" class="btn btn-primary float-end mx-2">
                 Submit
               </button>
-              <RouterLink to="/items" class="btn btn-danger float-end">
+              <RouterLink to="/customers" class="btn btn-danger float-end">
                 Batal
               </RouterLink>
             </form>
@@ -109,11 +128,13 @@ export default {
   data() {
     return {
       formData: {
-        namaItem: "",
-        unit: "",
-        stock: "",
-        hargaSatuan: "",
-        barang: null,
+        name: "",
+        contact: "",
+        email: "",
+        alamat: "",
+        diskon: "",
+        tipeDiskon: "",
+        ktp: null,
       },
       selectedFile: null,
       previewImage: null,
@@ -121,25 +142,27 @@ export default {
   },
   methods: {
     handleImageUpload(event) {
-      this.formData.barang = event.target.files[0];
+      this.formData.ktp = event.target.files[0];
       this.selectedFile = event.target.files[0];
       this.previewImage = URL.createObjectURL(this.selectedFile);
     },
-    async submitForm() {
+    async submitFormCustomer() {
       const jsonItems = {
-        namaItem: this.formData.namaItem,
-        unit: this.formData.unit,
-        stock: this.formData.stock,
-        hargaSatuan: this.formData.hargaSatuan,
+        name: this.formData.name,
+        contact: this.formData.contact,
+        email: this.formData.email,
+        alamat: this.formData.alamat,
+        diskon: this.formData.diskon,
+        tipeDiskon: this.formData.tipeDiskon,
       };
 
       const formData = new FormData();
-      formData.append("item", JSON.stringify(jsonItems));
-      formData.append("barang", this.formData.barang);
+      formData.append("customer", JSON.stringify(jsonItems));
+      formData.append("ktp", this.formData.ktp);
 
       try {
         const response = await axios.post(
-          "http://localhost/api/item",
+          "http://localhost/api/customer",
           formData,
           {
             headers: {
@@ -149,19 +172,19 @@ export default {
         );
 
         if (response.status === 201) {
-          const alertMessage = "Item added successfully!";
+          const alertMessage = "Customer added successfully!";
           this.$router.push({
-            name: "items",
+            name: "customers",
             query: { message: alertMessage, responseCode: response.status },
           });
-          console.log("Item added successfully");
+          console.log("Customers added successfully");
         } else {
-          const alertMessage = "Failed to add item!";
+          const alertMessage = "Failed to add customer!";
           this.$router.push({
-            name: "items",
+            name: "customers",
             query: { message: alertMessage, responseCode: response.status },
           });
-          console.error("Failed to add item");
+          console.error("Failed to add customer");
         }
       } catch (error) {
         console.error("Error:", error);

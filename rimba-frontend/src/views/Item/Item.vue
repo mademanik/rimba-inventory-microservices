@@ -132,7 +132,7 @@ export default {
       }
     },
     getImageUrl(id, barang) {
-      return `http://localhost/api/item/download/${id}/${barang}`;
+      return `http://localhost/api/item/barang/${id}/${barang}`;
     },
   },
 };

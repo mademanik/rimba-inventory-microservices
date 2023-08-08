@@ -4,13 +4,19 @@
       <div class="card-header">
         <h5>
           Customers
-          <RouterLink to="/student/create" class="btn btn-primary float-end">
+          <RouterLink
+            to="/customers/addCustomer"
+            class="btn btn-primary float-end mx-2"
+          >
             <i class="fas fa-plus"></i> Customer
+          </RouterLink>
+          <RouterLink to="/customers" class="btn btn-warning float-end">
+            Refresh
           </RouterLink>
         </h5>
       </div>
       <div class="card-body">
-        <div v-if="message" :class="alertCustomer" role="alert">
+        <div v-if="messageCustomer" :class="alertCustomer" role="alert">
           {{ messageCustomer }}
         </div>
         <div v-if="deleteMessage" class="alert alert-success">
@@ -45,7 +51,7 @@
                   :src="getImageUrl(customer.id, customer.ktp)"
                   alt=""
                   class="img-thumbnail"
-                  style="width: 80px;"
+                  style="width: 80px"
                 />
               </td>
               <td>
@@ -53,10 +59,10 @@
                   >Edit</RouterLink
                 >
                 <button
-                    type="button"
-                    class="btn btn-danger mx-2"
-                    @click="deleteItems(customer.id)"
-                  >
+                  type="button"
+                  class="btn btn-danger mx-2"
+                  @click="deleteCustomer(customer.id)"
+                >
                   Delete
                 </button>
               </td>
@@ -112,10 +118,10 @@ export default {
         console.log("getCustomers failed");
       }
     },
-    deleteItems(id) {
+    deleteCustomer(id) {
       if (window.confirm("Are you sure ? ")) {
         try {
-          axios.delete(`http://localhost/api/customers/${id}`).then((res) => {
+          axios.delete(`http://localhost/api/customer/${id}`).then((res) => {
             console.log(res);
             this.deleteMessage = "Customer deleted successfully!";
             this.getCustomers();
@@ -129,7 +135,7 @@ export default {
       }
     },
     getImageUrl(id, barang) {
-      return `http://localhost/api/item/download/${id}/${barang}`;
+      return `http://localhost/api/customer/ktp/${id}/${barang}`;
     },
   },
 };

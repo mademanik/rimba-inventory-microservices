@@ -9,3 +9,7 @@
 docker-compose-config/*
 
 uploads/*
+
+customer-service/target/
+item-service/target/
+sales-service/target/
