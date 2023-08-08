@@ -4,8 +4,14 @@
       <div class="card-header">
         <h4>
           Items List
-          <RouterLink to="/items/addItem" class="btn btn-primary float-end">
-            Add Items
+          <RouterLink
+            to="/items/addItem"
+            class="btn btn-primary float-end mx-2"
+          >
+          <i class="fas fa-plus"></i> Items
+          </RouterLink>
+          <RouterLink to="/items" class="btn btn-warning float-end">
+            Refresh
           </RouterLink>
         </h4>
       </div>
@@ -16,7 +22,7 @@
         <div v-if="deleteMessage" class="alert alert-success">
           {{ deleteMessage }}
         </div>
-        <table class="table table-bordered">
+        <table class="table table-bordered" style="width: 100%;">
           <thead>
             <tr>
               <th>ID</th>
@@ -35,16 +41,22 @@
               <td>{{ item.unit }}</td>
               <td>{{ item.stock }}</td>
               <td>{{ item.hargaSatuan }}</td>
-              <td>{{ item.barang }}</td>
+              <td>
+                <img
+                  :src="getImageUrl(item.id, item.barang)"
+                  alt=""
+                  class="img-thumbnail"
+                  style="width: 80px;"
+                />
+              </td>
               <td>
                 <div class="justify-content-between">
-                  <RouterLink to="/edit" class="btn btn-success"
+                  <RouterLink to="/editItem" class="btn btn-success"
                     >Edit</RouterLink
                   >
                   <button
                     type="button"
-                    class="btn btn-danger"
-                    style="margin-left: 10px"
+                    class="btn btn-danger mx-2"
                     @click="deleteItems(item.id)"
                   >
                     Delete
@@ -118,6 +130,9 @@ export default {
           console.log("delete item failed");
         }
       }
+    },
+    getImageUrl(id, barang) {
+      return `http://localhost/api/item/download/${id}/${barang}`;
     },
   },
 };

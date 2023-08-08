@@ -192,7 +192,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public Resource load(Long id, String filename) {
-        log.info("Request Product Download from server with id {}", id);
+        log.info("Request Item Download from server with id {}", id);
         try {
             Optional<Item> item = itemRepository.findById(id);
             Path root = Paths.get(fileUploadRoot);

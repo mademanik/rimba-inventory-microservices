@@ -6,6 +6,8 @@ import com.rimba.customer.dto.response.CustomerResponse;
 import com.rimba.customer.service.CustomerService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -84,5 +86,15 @@ public class CustomerController {
             log.info("Error deleteCustomerById {}", e.getMessage());
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @GetMapping("/download/{id}/{filename:.+}")
+    @ResponseBody
+    public ResponseEntity<Resource> getDownload(@PathVariable Long id, @PathVariable String filename) {
+        log.info("Download Request: " + filename + " with id " + id);
+        Resource file = customerService.load(id, filename);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"")
+                .body(file);
     }
 }

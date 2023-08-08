@@ -4,12 +4,7 @@
       <div class="col col-lg-6">
         <div class="card">
           <div class="card-header">
-            <h4>
-              Tambah Item
-              <RouterLink to="/items" class="btn btn-danger float-end">
-                Batal
-              </RouterLink>
-            </h4>
+            <h4>Tambah Item</h4>
           </div>
           <div class="card-body">
             <form @submit.prevent="submitForm">
@@ -75,7 +70,10 @@
                 />
               </div>
               <div class="mb-3">
-                <label for="formFile" class="form-label">Barang (Image)</label>
+                <label for="formFile" class="form-label"
+                  ><span class="text-danger"><strong>*</strong></span
+                  >Barang (Image)</label
+                >
                 <input
                   class="form-control"
                   type="file"
@@ -94,9 +92,12 @@
                   />
                 </div>
               </div>
-              <button type="submit" class="btn btn-primary float-end">
+              <button type="submit" class="btn btn-primary float-end mx-2">
                 Submit
               </button>
+              <RouterLink to="/items" class="btn btn-danger float-end">
+                Batal
+              </RouterLink>
             </form>
           </div>
         </div>
