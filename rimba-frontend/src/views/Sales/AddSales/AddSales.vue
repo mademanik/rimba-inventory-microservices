@@ -14,12 +14,13 @@
               <button @click="clearState" class="btn btn-warning my-3 mx-2">
                 Reset
               </button>
-              <table class="table table-bordered mb-5">
+              <table class="table table-bordered">
                 <thead>
                   <tr>
                     <th>ID</th>
                     <th>Nama</th>
-                    <th>Jumlah</th>
+                    <th>Harga satuan</th>
+                    <th>Qty</th>
                     <th>Aksi</th>
                   </tr>
                 </thead>
@@ -27,6 +28,7 @@
                   <tr v-for="item in selectedItems" :key="item.id">
                     <td>{{ item.id }}</td>
                     <td>{{ item.namaItem }}</td>
+                    <td>{{ item.hargaSatuan }}</td>
                     <input
                       class="form-control"
                       type="number"
@@ -44,6 +46,9 @@
                   </tr>
                 </tbody>
               </table>
+              <p class="mb-5 text-danger">
+                <span class="text-primary">*</span>Mohon mengisi quantity item
+              </p>
 
               <div class="mb-3">
                 <label class="form-label"
@@ -59,9 +64,9 @@
               </div>
               <div class="mb-3">
                 <label class="form-label"
-                  ><span class="text-danger"><strong>*</strong></span> Customer
-                  Name</label
-                >
+                  ><span class="text-danger"><strong>*</strong></span> Nama
+                  Customer
+                </label>
                 <select class="form-select" v-model="formData.customerId">
                   <option value="" :selected="!formData.customerId">
                     --Pilih Customers--
@@ -71,8 +76,8 @@
                     :key="customer.id"
                     :value="customer.id"
                   >
-                    {{ customer.id }} - {{ customer.name }} - (tipe diskon:
-                    {{ customer.tipeDiskon }}) - (diskon: {{ customer.diskon }})
+                    {{ customer.name }} (tipe diskon: {{ customer.tipeDiskon }},
+                    diskon: {{ customer.diskon }})
                   </option>
                 </select>
               </div>
@@ -92,7 +97,64 @@
           <div class="card-header">
             <h4>Payment</h4>
           </div>
-          <div class="card-body"></div>
+          <div class="card-body">
+            <form @submit.prevent="submitPayment">
+              <div class="mb-3">
+                <label class="form-label">Tgl Transaksi</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="tglTransaksi"
+                  v-model="formData.tglTransaksiInquiry"
+                  disabled
+                />
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Nama Customer</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="tglTransaksi"
+                  v-model="formData.customerNameInquiry"
+                  disabled
+                />
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Total Diskon</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="totalDiskon"
+                  v-model="formData.totalDiskon"
+                  disabled
+                />
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Total Harga</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="totalHarga"
+                  v-model="formData.totalHarga"
+                  disabled
+                />
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Total Bayar</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="totalBayar"
+                  v-model="formData.totalBayar"
+                  disabled
+                />
+              </div>
+
+              <button type="submit" class="btn btn-success float-end mx-2 mt-4">
+                Payment
+              </button>
+            </form>
+          </div>
         </div>
       </div>
     </div>
@@ -111,7 +173,14 @@ export default {
         customerId: "",
         itemSales: [],
         customers: [],
+        tglTransaksiInquiry: "",
+        customerNameInquiry: "",
+        customerIdInquiry: "",
+        totalDiskon: 0,
+        totalHarga: 0,
+        totalBayar: 0,
       },
+      // selectedItems: [],
     };
   },
   computed: {
@@ -133,7 +202,6 @@ export default {
       try {
         const response = await axios.get("http://localhost/api/customer");
         this.customers = response.data;
-        console.log(this.customers);
       } catch (error) {
         console.error("Error fetching customer data:", error);
       }
@@ -189,9 +257,69 @@ export default {
           }
         );
 
-        console.log(response);
+        this.formData.tglTransaksiInquiry = response.data.tglTransaksi;
+        this.formData.customerNameInquiry = response.data.customer.name;
+        this.formData.customerIdInquiry = response.data.customer.id;
+        this.formData.totalDiskon = response.data.totalDiskon;
+        this.formData.totalHarga = response.data.totalHarga;
+        this.formData.totalBayar = response.data.totalBayar;
       } catch (error) {
         console.error("Error:", error);
+      }
+    },
+
+    async submitPayment() {
+      if (window.confirm("Are you sure ? ")) {
+        const formData = new FormData();
+
+        const itemSales = this.selectedItems.map((item) => {
+          return {
+            itemId: item.id,
+            qty: item.qty,
+          };
+        });
+
+        this.formData.itemSales = itemSales;
+
+        const jsonItems = {
+          tglTransaksi: this.formData.tglTransaksiInquiry,
+          customerId: this.formData.customerIdInquiry,
+          itemSales: this.formData.itemSales,
+        };
+
+        formData.append("sales", JSON.stringify(jsonItems));
+
+        try {
+          const response = await axios.post(
+            "http://localhost/api/sales/",
+            formData,
+            {
+              headers: {
+                "Content-Type": "multipart/form-data",
+              },
+            }
+          );
+
+          console.log(response);
+
+          if (response.status === 200) {
+            const alertMessage = "New Sales added successfully!";
+            this.$router.push({
+              name: "sales",
+              query: { message: alertMessage, responseCode: response.status },
+            });
+            console.log(alertMessage);
+          } else {
+            const alertMessage = "Failed to add New Sales!";
+            this.$router.push({
+              name: "sales",
+              query: { message: alertMessage, responseCode: response.status },
+            });
+            console.log(alertMessage);
+          }
+        } catch (error) {
+          console.error("Error:", error);
+        }
       }
     },
   },

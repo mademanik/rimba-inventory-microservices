@@ -14,6 +14,7 @@ const store = createStore({
       console.log(state);
     },
     addItem(state, item) {
+      item.qty = "1";
       state.selectedItems.push(item);
     },
     clearState(state) {

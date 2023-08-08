@@ -16,6 +16,10 @@
         </h4>
       </div>
       <div class="card-body">
+        <div v-if="message" :class="alertClasses" role="alert">
+          {{ message }}
+        </div>
+
         <table class="table table-bordered">
           <thead>
             <tr>
@@ -39,9 +43,6 @@
               <td>{{ sale.totalHarga }}</td>
               <td>{{ sale.totalBayar }}</td>
               <td>
-                <RouterLink to="/editSales" class="btn btn-success ml-2 mr-2"
-                  >Edit</RouterLink
-                >
                 <button
                   type="button"
                   class="btn btn-danger mx-2"
@@ -77,6 +78,20 @@ export default {
   },
   mounted() {
     this.getSales();
+  },
+  computed: {
+    message() {
+      return this.$route.query.message;
+    },
+    alertClasses() {
+      const isSuccess = this.$route.query.responseCode === "200";
+
+      return {
+        alert: true,
+        "alert-success": isSuccess,
+        "alert-danger": !isSuccess,
+      };
+    },
   },
   methods: {
     getSales() {
