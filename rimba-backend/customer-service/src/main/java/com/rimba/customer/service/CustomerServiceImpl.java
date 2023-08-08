@@ -74,6 +74,67 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
+    public CustomerResponse updateCustomerById(Long id, CustomerRequest customerRequest, MultipartFile ktp) {
+        Long getDateName = new Date().getTime();
+
+        Optional<Customer> customerData = customerRepository.findById(id);
+        String namaKtp = "";
+
+        if (ktp != null) {
+            String currentKtp = customerData.get().getKtp();
+
+            //rename thumbnail
+            String getFileName = FilenameUtils.removeExtension(ktp.getOriginalFilename());
+            String getFileExt = FilenameUtils.getExtension(ktp.getOriginalFilename());
+            namaKtp = getFileName + getDateName + "_ktp." + getFileExt;
+
+            String setRootPath = fileUploadRoot + "/";
+
+            Path file = Paths.get(fileUploadRoot + "/" + currentKtp);
+
+            //upload ktp
+            try {
+                Path root = Paths.get(setRootPath);
+                Files.createDirectories(root);
+                Files.copy(ktp.getInputStream(), root.resolve(namaKtp));
+
+                boolean result = Files.deleteIfExists(file);
+                if (result) {
+                    log.info("Current Barang is successfully deleted!");
+                } else {
+                    log.warn("Sorry, unable to delete thumbnail");
+                }
+            } catch (IOException e) {
+                if (e instanceof FileAlreadyExistsException) {
+                    throw new RuntimeException("A thumbnail of that name already exists.");
+                }
+                throw new RuntimeException(e.getMessage());
+            }
+        }
+
+        if (customerData.isPresent()) {
+            Customer customer = customerData.get();
+            customer.setName(customerRequest.getName());
+            customer.setContact(customerRequest.getContact());
+            customer.setEmail(customerRequest.getEmail());
+            customer.setAlamat(customerRequest.getAlamat());
+            customer.setDiskon(customerRequest.getDiskon());
+            customer.setTipeDiskon(customerRequest.getTipeDiskon());
+            if (ktp != null) {
+                customer.setKtp(namaKtp);
+            }
+            customer.setCreatedAt(new Date());
+            customer.setUpdatedAt(new Date());
+
+            log.info("Customer with id: {} is successfully updated", id);
+            customerRepository.save(customer);
+            return mapToCustomerResponse(customer);
+        } else {
+            return null;
+        }
+    }
+
+    @Override
     public List<CustomerResponse> getAllCustomers() {
         List<Customer> customers = customerRepository.findAll();
         log.info("getAllCustomers successfully retrieved");

@@ -11,6 +11,8 @@ public interface CustomerService {
 
     public CustomerResponse createCustomer(CustomerRequest customerRequest, MultipartFile ktp);
 
+    public CustomerResponse updateCustomerById(Long id, CustomerRequest customerRequest, MultipartFile ktp);
+
     public List<CustomerResponse> getAllCustomers();
 
     public Optional<CustomerResponse> getCustomerById(Long id);

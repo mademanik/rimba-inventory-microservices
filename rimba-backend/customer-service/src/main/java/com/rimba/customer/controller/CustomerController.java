@@ -38,6 +38,21 @@ public class CustomerController {
         }
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<CustomerResponse> updateCustomerById(@PathVariable("id") Long id, @RequestPart("customer") String customer, @RequestPart(value = "ktp", required = false) MultipartFile ktp) {
+        CustomerRequest customerRequest = new CustomerRequest();
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            customerRequest = mapper.readValue(customer, CustomerRequest.class);
+
+            CustomerResponse customerResponse = customerService.updateCustomerById(id, customerRequest, ktp);
+            return new ResponseEntity<>(customerResponse, HttpStatus.OK);
+        } catch (Exception e) {
+            log.info("Error creating customer {}", e.getMessage());
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @GetMapping
     public ResponseEntity<List<CustomerResponse>> getAllCustomers() {
         try {

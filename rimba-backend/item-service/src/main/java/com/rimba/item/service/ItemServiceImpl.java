@@ -9,12 +9,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileSystemUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -73,6 +76,63 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    public ItemResponse updateItemById(Long id, ItemRequest itemRequest, MultipartFile barang) {
+        Long getDateName = new Date().getTime();
+
+        Optional<Item> itemData = itemRepository.findById(id);
+        String namaBarangThumbnail = "";
+
+        //upload barang thumbnail
+        if (barang != null) {
+
+            String currentBarang = itemData.get().getBarang();
+
+            //rename thumbnail
+            String getFileName = FilenameUtils.removeExtension(barang.getOriginalFilename());
+            String getFileExt = FilenameUtils.getExtension(barang.getOriginalFilename());
+            namaBarangThumbnail = getFileName + getDateName + "_barang." + getFileExt;
+
+            String setRootPath = fileUploadRoot + "/";
+
+            Path file = Paths.get(fileUploadRoot + "/" + currentBarang);
+            try {
+                Path root = Paths.get(setRootPath);
+                Files.copy(barang.getInputStream(), root.resolve(namaBarangThumbnail));
+
+                boolean result = Files.deleteIfExists(file);
+                if (result) {
+                    log.info("Current Barang is successfully deleted!");
+                } else {
+                    log.warn("Sorry, unable to delete thumbnail");
+                }
+            } catch (IOException e) {
+                if (e instanceof FileAlreadyExistsException) {
+                    throw new RuntimeException("A thumbnail of that name already exists.");
+                }
+                throw new RuntimeException(e.getMessage());
+            }
+        }
+
+        if (itemData.isPresent()) {
+            Item item = itemData.get();
+            item.setNamaItem(itemRequest.getNamaItem());
+            item.setUnit(itemRequest.getUnit());
+            item.setStock(itemRequest.getStock());
+            item.setHargaSatuan(itemRequest.getHargaSatuan());
+            if (barang != null) {
+                item.setBarang(namaBarangThumbnail);
+            }
+            item.setCreatedAt(new Date());
+            item.setUpdatedAt(new Date());
+            log.info("Item with id: {} is successfully updated", id);
+            itemRepository.save(item);
+            return mapToItemResponse(item);
+        } else {
+            return null;
+        }
+    }
+
+    @Override
     public List<ItemResponse> getAllItems() {
         List<Item> items = itemRepository.findAll();
         log.info("getAllItems successfully retrieved");
@@ -127,6 +187,27 @@ public class ItemServiceImpl implements ItemService {
             return true;
         } else {
             return false;
+        }
+    }
+
+    @Override
+    public Resource load(Long id, String filename) {
+        log.info("Request Product Download from server with id {}", id);
+        try {
+            Optional<Item> item = itemRepository.findById(id);
+            Path root = Paths.get(fileUploadRoot);
+            Path file = root.resolve(filename);
+
+            Resource resource = new UrlResource(file.toUri());
+
+            if (resource.exists() || resource.isReadable()) {
+                return resource;
+            } else {
+                throw new RuntimeException("Could not read the file!");
+            }
+
+        } catch (MalformedURLException e) {
+            throw new RuntimeException("Error: " + e.getMessage());
         }
     }
 

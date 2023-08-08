@@ -68,7 +68,7 @@ public class SalesServiceImpl implements SalesService {
                     totalBayar = totalBayar.add(hargaSebelumDiskon.subtract(diskonInit.multiply(BigDecimal.valueOf(itemSales.getQty()))));
 
                 } else {
-                    BigDecimal diskonInit = item.getHargaSatuan().subtract(BigDecimal.valueOf(customer.getDiskon()));
+                    BigDecimal diskonInit = BigDecimal.valueOf(customer.getDiskon());
                     totalDiskon = totalDiskon.add(diskonInit.multiply(BigDecimal.valueOf(itemSales.getQty())));
                     BigDecimal hargaSebelumDiskon = item.getHargaSatuan().multiply(BigDecimal.valueOf(itemSales.getQty()));
                     totalHarga = totalHarga.add(item.getHargaSatuan().multiply(BigDecimal.valueOf(itemSales.getQty())));
@@ -78,6 +78,12 @@ public class SalesServiceImpl implements SalesService {
                 //updated stock
                 updateItemStock(itemSales.getItemId(), itemSales.getQty());
             }
+        }
+
+        if (customer.getTipeDiskon() == "") {
+            log.info(customer.getTipeDiskon());
+            totalDiskon = BigDecimal.ZERO;
+            totalBayar = totalHarga;
         }
 
         if (getStockErrors.size() > 0) {
@@ -99,6 +105,71 @@ public class SalesServiceImpl implements SalesService {
 
             log.info("Sales with id : {} is successfully created", sales.getId());
             return mapToSalesResponse(sales, customer, items);
+        }
+    }
+
+    @Override
+    public SalesInquiryResponse inquirySales(SalesRequest salesRequest) {
+
+        List<String> getStockErrors = new ArrayList<>();
+        List<Item> items = new ArrayList<>();
+        BigDecimal totalDiskon = BigDecimal.ZERO;
+        BigDecimal totalHarga = BigDecimal.ZERO;
+        BigDecimal totalBayar = BigDecimal.ZERO;
+
+        Customer customer = getCustomer(salesRequest.getCustomerId());
+
+        for (ItemSales itemSales : salesRequest.getItemSales()) {
+            ItemStockResponse itemStockResponse = getItemStock(itemSales.getItemId());
+
+            Item item = new Item();
+
+            Double getDiffStock = itemStockResponse.getStock() - itemSales.getQty();
+
+            if (getDiffStock < 0) {
+                getStockErrors.add("Item with id " + itemSales.getItemId() + " is out of stock");
+            } else {
+                item = getItem(itemSales.getItemId());
+                item.setStock(itemSales.getQty());
+                items.add(item);
+
+                if (customer.getTipeDiskon().equalsIgnoreCase("persentase")) {
+                    BigDecimal diskonInit = item.getHargaSatuan().multiply(BigDecimal.valueOf(customer.getDiskon() / 100));
+                    totalDiskon = totalDiskon.add(diskonInit.multiply(BigDecimal.valueOf(itemSales.getQty())));
+                    BigDecimal hargaSebelumDiskon = item.getHargaSatuan().multiply(BigDecimal.valueOf(itemSales.getQty()));
+                    totalHarga = totalHarga.add(item.getHargaSatuan().multiply(BigDecimal.valueOf(itemSales.getQty())));
+                    totalBayar = totalBayar.add(hargaSebelumDiskon.subtract(diskonInit.multiply(BigDecimal.valueOf(itemSales.getQty()))));
+
+                } else {
+                    BigDecimal diskonInit = item.getHargaSatuan().subtract(BigDecimal.valueOf(customer.getDiskon()));
+                    totalDiskon = totalDiskon.add(diskonInit.multiply(BigDecimal.valueOf(itemSales.getQty())));
+
+                    BigDecimal hargaSebelumDiskon = item.getHargaSatuan().multiply(BigDecimal.valueOf(itemSales.getQty()));
+                    totalHarga = totalHarga.add(item.getHargaSatuan().multiply(BigDecimal.valueOf(itemSales.getQty())));
+                    totalBayar = totalBayar.add(hargaSebelumDiskon.subtract(diskonInit.multiply(BigDecimal.valueOf(itemSales.getQty()))));
+                }
+            }
+        }
+
+        if (customer.getTipeDiskon() == "") {
+            log.info(customer.getTipeDiskon());
+            totalDiskon = BigDecimal.ZERO;
+            totalBayar = totalHarga;
+        }
+
+        if (getStockErrors.size() > 0) {
+            return null;
+        } else {
+            SalesInquiryResponse salesInquiryResponsee = SalesInquiryResponse.builder()
+                    .tglTransaksi(salesRequest.getTglTransaksi())
+                    .customer(customer)
+                    .item(items)
+                    .totalDiskon(totalDiskon)
+                    .totalHarga(totalHarga)
+                    .totalBayar(totalBayar)
+                    .build();
+
+            return salesInquiryResponsee;
         }
     }
 

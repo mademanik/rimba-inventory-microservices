@@ -2,6 +2,7 @@ package com.rimba.sales.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rimba.sales.dto.request.SalesRequest;
+import com.rimba.sales.dto.response.SalesInquiryResponse;
 import com.rimba.sales.dto.response.SalesResponse;
 import com.rimba.sales.service.SalesService;
 import lombok.extern.slf4j.Slf4j;
@@ -32,12 +33,32 @@ public class SalesController {
             SalesResponse salesResponse = salesService.createSales(salesRequest);
 
             if (salesResponse == null) {
-                return new ResponseEntity<String>("Some item is out of stock", HttpStatus.OK);
+                return new ResponseEntity<String>("item out of stock", HttpStatus.OK);
             } else {
                 return new ResponseEntity<>(salesResponse, HttpStatus.OK);
             }
         } catch (Exception e) {
             log.info("Error creating sales {}", e.getMessage());
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("/inquiry")
+    public ResponseEntity<?> inquirySales(@RequestPart("sales") String sales) {
+        SalesRequest salesRequest = new SalesRequest();
+
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            salesRequest = mapper.readValue(sales, SalesRequest.class);
+            SalesInquiryResponse salesInquiryResponse = salesService.inquirySales(salesRequest);
+
+            if (salesInquiryResponse == null) {
+                return new ResponseEntity<String>("item out of stock", HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(salesInquiryResponse, HttpStatus.OK);
+            }
+        } catch (Exception e) {
+            log.info("Error inquiry sales {}", e.getMessage());
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

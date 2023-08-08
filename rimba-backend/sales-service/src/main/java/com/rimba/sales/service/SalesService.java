@@ -10,6 +10,8 @@ public interface SalesService {
 
     public SalesResponse createSales(SalesRequest salesRequest);
 
+    public SalesInquiryResponse inquirySales(SalesRequest salesRequest);
+
     public List<SalesResponse> getAllSales();
 
     public Optional<SalesResponse> getSalesById(Long id);
