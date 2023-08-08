@@ -5,6 +5,7 @@ import ItemView from "../views/Item/Item.vue";
 import SalesView from "../views/Sales/Sales.vue";
 import AddItemView from "../views/Item/AddItem/AddItem.vue";
 import AddCustomerView from "../views/Customer/AddCustomer/AddCustomer.vue";
+import AddSalesView from "../views/Sales/AddSales/AddSales.vue";
 
 
 const router = createRouter({
@@ -39,6 +40,11 @@ const router = createRouter({
       path: "/sales",
       name: "sales",
       component: SalesView,
+    },
+    {
+      path: "/sales/addSales",
+      name: "addSales",
+      component: AddSalesView,
     },
   ],
 });

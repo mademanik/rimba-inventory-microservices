@@ -4,8 +4,14 @@
       <div class="card-header">
         <h4>
           Sales
-          <RouterLink to="/student/create" class="btn btn-primary float-end">
-            Add Sales
+          <RouterLink
+            to="/sales/addSales"
+            class="btn btn-primary float-end mx-2"
+          >
+            <i class="fas fa-plus"></i> Sales
+          </RouterLink>
+          <RouterLink to="/sales" class="btn btn-warning float-end">
+            Refresh
           </RouterLink>
         </h4>
       </div>
@@ -13,28 +19,34 @@
         <table class="table table-bordered">
           <thead>
             <tr>
-              <th>ID</th>
-              <th>Name</th>
-              <th>Website</th>
-              <th>Email</th>
-              <th>Phone</th>
-              <th>Created At</th>
+              <th>Kode Transaksi</th>
+              <th>Tgl Transaksi</th>
+              <th>Cust. Name</th>
+              <th>Total Diskon</th>
+              <th>Total Harga</th>
+              <th>Total Bayar</th>
               <th>Action</th>
             </tr>
           </thead>
-          <tbody v-if="this.students.length > 0">
-            <tr v-for="(student, index) in this.students" :key="index">
-              <td>{{ student.id }}</td>
-              <td>{{ student.name }}</td>
-              <td>{{ student.website }}</td>
-              <td>{{ student.email }}</td>
-              <td>{{ student.phone }}</td>
-              <td>Now</td>
+          <tbody v-if="this.sales.length > 0">
+            <tr v-for="(sale, index) in this.sales" :key="index">
               <td>
-                <RouterLink to="/edit" class="btn btn-success ml-2 mr-2"
+                <small> {{ sale.kodeTransaksi }}</small>
+              </td>
+              <td>{{ sale.tglTransaksi }}</td>
+              <td>{{ sale.customer.name }}</td>
+              <td>{{ sale.totalDiskon }}</td>
+              <td>{{ sale.totalHarga }}</td>
+              <td>{{ sale.totalBayar }}</td>
+              <td>
+                <RouterLink to="/editSales" class="btn btn-success ml-2 mr-2"
                   >Edit</RouterLink
                 >
-                <button type="button" class="btn btn-danger ml-2 mr-2">
+                <button
+                  type="button"
+                  class="btn btn-danger mx-2"
+                  @click="deleteSales(sale.id)"
+                >
                   Delete
                 </button>
               </td>
@@ -42,7 +54,7 @@
           </tbody>
           <tbody v-else>
             <tr>
-              <td colspan="7">Loading...</td>
+              <td colspan="7">No Data Found...</td>
             </tr>
           </tbody>
         </table>
@@ -55,22 +67,31 @@
 import axios from "axios";
 
 export default {
-  name: "students",
+  name: "sales",
   data() {
     return {
-      students: [],
+      sales: [],
+      alertMessage: "",
+      deleteMessage: "",
     };
   },
   mounted() {
-    // console.log("Made Manik");
-    this.getStudents();
+    this.getSales();
   },
   methods: {
-    getStudents() {
-      axios.get("https://jsonplaceholder.typicode.com/users").then((res) => {
-        this.students = res.data;
-        console.log(this.students);
-      });
+    getSales() {
+      try {
+        axios.get("http://localhost/api/sales").then((res) => {
+          this.sales = res.data;
+        });
+      } catch (err) {
+        console.log("getSales failed");
+      }
+    },
+    deleteSales(id) {
+      if (window.confirm("Are you sure ? ")) {
+        console.log(id);
+      }
     },
   },
 };

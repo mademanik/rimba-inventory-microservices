@@ -70,7 +70,7 @@
           </tbody>
           <tbody v-else>
             <tr>
-              <td colspan="7">No Data Found...</td>
+              <td colspan="9">No Data Found...</td>
             </tr>
           </tbody>
         </table>
