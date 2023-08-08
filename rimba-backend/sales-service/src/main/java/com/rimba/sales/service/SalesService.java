@@ -26,4 +26,6 @@ public interface SalesService {
 
     public ItemStockUpdate updateItemStock(Long id, Double stock);
 
+    public ItemStockRollback rollbackItemStock(Long id, Double stock);
+
 }

@@ -191,6 +191,24 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    public Boolean rollbackItemStock(Long id, Double reqStock) {
+        Optional<Item> itemData = itemRepository.findById(id);
+        if (itemData.isPresent()) {
+            Item item = itemData.get();
+            Double currentStock = item.getStock();
+            item.setStock(item.getStock() + reqStock);
+
+            log.info("Rollback item with id: " + id + ", currentStock: " + currentStock + ", reqStock: " + reqStock);
+            log.info("Item Stock with id: {} is successfully rollback", id);
+            itemRepository.save(item);
+
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    @Override
     public Resource load(Long id, String filename) {
         log.info("Request Item Download from server with id {}", id);
         try {

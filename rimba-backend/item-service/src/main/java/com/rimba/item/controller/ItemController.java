@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rimba.item.dto.request.ItemRequest;
 import com.rimba.item.dto.response.ItemResponse;
 import com.rimba.item.dto.response.ItemStockResponse;
+import com.rimba.item.dto.response.ItemStockRollback;
 import com.rimba.item.dto.response.ItemStockUpdate;
 import com.rimba.item.service.ItemService;
 import lombok.extern.slf4j.Slf4j;
@@ -114,6 +115,22 @@ public class ItemController {
         } catch (Exception e) {
             log.info("Error updateItemStock {}", e.getMessage());
             return new ResponseEntity<>(itemStockUpdate, HttpStatus.OK);
+        }
+    }
+
+    @GetMapping("/rollbackStock/{id}/{stock}")
+    public ResponseEntity<ItemStockRollback> rollbackItemStock(@PathVariable("id") Long id, @PathVariable("stock") Double stock) {
+        ItemStockRollback itemStockRollback = new ItemStockRollback();
+        itemStockRollback.setIsStockRollback(false);
+        try {
+            Boolean isRollback = itemService.rollbackItemStock(id, stock);
+            if (isRollback) {
+                itemStockRollback.setIsStockRollback(isRollback);
+            }
+            return new ResponseEntity<>(itemStockRollback, HttpStatus.OK);
+        } catch (Exception e) {
+            log.info("Error updateItemStock {}", e.getMessage());
+            return new ResponseEntity<>(itemStockRollback, HttpStatus.OK);
         }
     }
 

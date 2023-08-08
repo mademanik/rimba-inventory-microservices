@@ -24,5 +24,7 @@ public interface ItemService {
 
     public Boolean updateItemStock(Long id, Double reqStock);
 
+    public Boolean rollbackItemStock(Long id, Double reqStock);
+
     public Resource load(Long id, String filename);
 }

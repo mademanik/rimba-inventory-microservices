@@ -86,7 +86,7 @@ public class SalesController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<HttpStatus> deleteStatusById(@PathVariable("id") Long id) {
+    public ResponseEntity<HttpStatus> deleteSalesById(@PathVariable("id") Long id) {
         try {
             salesService.deleteSalesById(id);
             return new ResponseEntity<>(null, HttpStatus.OK);

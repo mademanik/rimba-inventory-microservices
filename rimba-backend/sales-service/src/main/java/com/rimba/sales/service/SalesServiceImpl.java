@@ -61,6 +61,7 @@ public class SalesServiceImpl implements SalesService {
                 items.add(item);
 
                 if (customer.getTipeDiskon().equalsIgnoreCase("persentase")) {
+                    log.info("diskon persentase");
                     BigDecimal diskonInit = item.getHargaSatuan().multiply(BigDecimal.valueOf(customer.getDiskon() / 100));
                     totalDiskon = totalDiskon.add(diskonInit.multiply(BigDecimal.valueOf(itemSales.getQty())));
                     BigDecimal hargaSebelumDiskon = item.getHargaSatuan().multiply(BigDecimal.valueOf(itemSales.getQty()));
@@ -68,6 +69,7 @@ public class SalesServiceImpl implements SalesService {
                     totalBayar = totalBayar.add(hargaSebelumDiskon.subtract(diskonInit.multiply(BigDecimal.valueOf(itemSales.getQty()))));
 
                 } else {
+                    log.info("diskon fix");
                     BigDecimal diskonInit = BigDecimal.valueOf(customer.getDiskon());
                     totalDiskon = totalDiskon.add(diskonInit.multiply(BigDecimal.valueOf(itemSales.getQty())));
                     BigDecimal hargaSebelumDiskon = item.getHargaSatuan().multiply(BigDecimal.valueOf(itemSales.getQty()));
@@ -134,6 +136,7 @@ public class SalesServiceImpl implements SalesService {
                 items.add(item);
 
                 if (customer.getTipeDiskon().equalsIgnoreCase("persentase")) {
+                    log.info("diskon persentase");
                     BigDecimal diskonInit = item.getHargaSatuan().multiply(BigDecimal.valueOf(customer.getDiskon() / 100));
                     totalDiskon = totalDiskon.add(diskonInit.multiply(BigDecimal.valueOf(itemSales.getQty())));
                     BigDecimal hargaSebelumDiskon = item.getHargaSatuan().multiply(BigDecimal.valueOf(itemSales.getQty()));
@@ -141,9 +144,9 @@ public class SalesServiceImpl implements SalesService {
                     totalBayar = totalBayar.add(hargaSebelumDiskon.subtract(diskonInit.multiply(BigDecimal.valueOf(itemSales.getQty()))));
 
                 } else {
-                    BigDecimal diskonInit = item.getHargaSatuan().subtract(BigDecimal.valueOf(customer.getDiskon()));
+                    log.info("diskon fix");
+                    BigDecimal diskonInit = BigDecimal.valueOf(customer.getDiskon());
                     totalDiskon = totalDiskon.add(diskonInit.multiply(BigDecimal.valueOf(itemSales.getQty())));
-
                     BigDecimal hargaSebelumDiskon = item.getHargaSatuan().multiply(BigDecimal.valueOf(itemSales.getQty()));
                     totalHarga = totalHarga.add(item.getHargaSatuan().multiply(BigDecimal.valueOf(itemSales.getQty())));
                     totalBayar = totalBayar.add(hargaSebelumDiskon.subtract(diskonInit.multiply(BigDecimal.valueOf(itemSales.getQty()))));
@@ -183,7 +186,9 @@ public class SalesServiceImpl implements SalesService {
             List<Item> items = new ArrayList<>();
 
             sale.getItem().forEach(item -> {
+                Double saveCurrentSalesStock = item.getQty();
                 Item newitem = getItem(item.getItemId());
+                newitem.setStock(saveCurrentSalesStock);
                 items.add(newitem);
             });
 
@@ -213,7 +218,9 @@ public class SalesServiceImpl implements SalesService {
         List<Item> items = new ArrayList<>();
 
         sale.get().getItem().forEach(item -> {
+            Double saveCurrentSalesStock = item.getQty();
             Item newitem = getItem(item.getItemId());
+            newitem.setStock(saveCurrentSalesStock);
             items.add(newitem);
         });
 
@@ -235,6 +242,13 @@ public class SalesServiceImpl implements SalesService {
     @Override
     public void deleteSalesById(Long id) {
         Optional<Sales> sale = salesRepository.findById(id);
+
+        List<Item> items = new ArrayList<>();
+
+        //rollback stock
+        sale.get().getItem().forEach(item -> {
+            rollbackItemStock(item.getItemId(), item.getQty());
+        });
 
         salesRepository.deleteById(id);
         log.info("Sales with id: {} is successfully deleted", id);
@@ -308,5 +322,19 @@ public class SalesServiceImpl implements SalesService {
                 .block();
 
         return itemStockUpdate;
+    }
+
+    @Override
+    public ItemStockRollback rollbackItemStock(Long id, Double stock) {
+        String url = itemUrl + "/rollbackStock/" + id + "/" + stock;
+
+        ItemStockRollback itemStockRollback = webClientBuilder.build()
+                .get()
+                .uri(url)
+                .retrieve()
+                .bodyToMono(ItemStockRollback.class)
+                .block();
+
+        return itemStockRollback;
     }
 }
