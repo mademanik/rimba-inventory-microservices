@@ -15,7 +15,16 @@ const store = createStore({
     },
     addItem(state, item) {
       item.qty = "1";
-      state.selectedItems.push(item);
+      
+      const existingItem = state.selectedItems.find((i) => i.id === item.id);
+
+      if (!existingItem) {
+        state.selectedItems.push(item);
+      } else {
+        alert("Item sudah ditambahkan");
+      }
+
+      // state.selectedItems.push(item);
     },
     clearState(state) {
       console.log(state.selectedItems);
