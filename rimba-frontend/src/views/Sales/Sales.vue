@@ -54,6 +54,13 @@
               <td>
                 <button
                   type="button"
+                  class="btn btn-success"
+                  @click="viewSales(sale.id)"
+                >
+                  Detail
+                </button>
+                <button
+                  type="button"
                   class="btn btn-danger mx-2"
                   @click="deleteSales(sale.id)"
                 >
@@ -132,6 +139,12 @@ export default {
       this.getSales();
       this.$router.push({
         name: "sales",
+      });
+    },
+    viewSales(id) {
+      this.$router.push({
+        name: "viewSales",
+        query: { salesId: id },
       });
     },
   },

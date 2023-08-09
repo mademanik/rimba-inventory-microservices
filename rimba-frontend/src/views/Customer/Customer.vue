@@ -26,6 +26,9 @@
         <div v-if="messageCustomer" :class="alertCustomer" role="alert">
           {{ messageCustomer }}
         </div>
+        <div v-if="updateMessageCustomer" :class="alertCustomer" role="alert">
+          {{ updateMessageCustomer }}
+        </div>
         <div v-if="deleteMessage" class="alert alert-success">
           {{ deleteMessage }}
         </div>
@@ -62,9 +65,13 @@
                 />
               </td>
               <td>
-                <RouterLink to="/editCustomer" class="btn btn-success"
-                  >Edit</RouterLink
+                <button
+                  type="button"
+                  class="btn btn-success"
+                  @click="editCustomer(customer.id)"
                 >
+                  Edit
+                </button>
                 <button
                   type="button"
                   class="btn btn-danger mx-2"
@@ -105,8 +112,13 @@ export default {
     messageCustomer() {
       return this.$route.query.message;
     },
+    updateMessageCustomer() {
+      return this.$route.query.updateMessage;
+    },
     alertCustomer() {
-      const isSuccess = this.$route.query.responseCode === "201";
+      const isSuccess =
+        this.$route.query.responseCode === "201" ||
+        this.$route.query.responseCode === "200";
 
       return {
         alert: true,
@@ -129,7 +141,6 @@ export default {
       if (window.confirm("Are you sure ? ")) {
         try {
           axios.delete(`http://localhost/api/customer/${id}`).then((res) => {
-            console.log(res);
             this.deleteMessage = "Customer deleted successfully!";
             this.getCustomers();
             setTimeout(() => {
@@ -143,6 +154,12 @@ export default {
     },
     getImageUrl(id, barang) {
       return `http://localhost/api/customer/ktp/${id}/${barang}`;
+    },
+    editCustomer(id) {
+      this.$router.push({
+        name: "editCustomer",
+        query: { customerId: id },
+      });
     },
     refreshCustomers() {
       this.getCustomers();

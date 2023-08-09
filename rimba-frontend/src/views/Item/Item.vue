@@ -26,6 +26,9 @@
         <div v-if="message" :class="alertClasses" role="alert">
           {{ message }}
         </div>
+        <div v-if="updateMessage" :class="alertClasses" role="alert">
+          {{ updateMessage }}
+        </div>
         <div v-if="deleteMessage" class="alert alert-success">
           {{ deleteMessage }}
         </div>
@@ -58,9 +61,16 @@
               </td>
               <td>
                 <div class="justify-content-between">
-                  <RouterLink to="/editItem" class="btn btn-success"
+                  <!-- <RouterLink to="/editItem" class="btn btn-success"
                     >Edit</RouterLink
+                  > -->
+                  <button
+                    type="button"
+                    class="btn btn-success"
+                    @click="editItems(item.id)"
                   >
+                    Edit
+                  </button>
                   <button
                     type="button"
                     class="btn btn-danger mx-2"
@@ -102,8 +112,13 @@ export default {
     message() {
       return this.$route.query.message;
     },
+    updateMessage() {
+      return this.$route.query.updateMessage;
+    },
     alertClasses() {
-      const isSuccess = this.$route.query.responseCode === "201";
+      const isSuccess =
+        this.$route.query.responseCode === "201" ||
+        this.$route.query.responseCode === "200";
 
       return {
         alert: true,
@@ -140,6 +155,12 @@ export default {
     },
     getImageUrl(id, barang) {
       return `http://localhost/api/item/barang/${id}/${barang}`;
+    },
+    editItems(id) {
+      this.$router.push({
+        name: "editItem",
+        query: { itemId: id },
+      });
     },
     refreshItems() {
       this.getItems();
